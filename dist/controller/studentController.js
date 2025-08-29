@@ -3,19 +3,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllStudents = exports.getOneStudent = exports.getStudentByDepartments = exports.createStudent = void 0;
+exports.updateProjectStatus = exports.getAllStudents = exports.getOneStudent = exports.getStudentByDepartments = exports.createStudent = void 0;
 const projectModel_1 = __importDefault(require("../model/projectModel"));
 const studentModel_1 = __importDefault(require("../model/studentModel"));
 const createStudent = async (req, res) => {
     try {
-        const { studentID, firstName, lastName, email, phoneNumber, enrollmentDate, department, projects, } = req.body;
+        const { studentID, firstName, lastName, email, phoneNumber, enrollmentDate, department, projects, closureDate, session, } = req.body;
         if (!studentID ||
             !firstName ||
             !lastName ||
             !email ||
             !phoneNumber ||
             !enrollmentDate ||
-            !department) {
+            !department ||
+            !closureDate ||
+            !session) {
             return res.status(400).json({ message: "All fields required" });
         }
         let projectsIds = [];
@@ -31,6 +33,8 @@ const createStudent = async (req, res) => {
             phoneNumber,
             enrollmentDate,
             department,
+            session,
+            closureDate,
             project: projectsIds,
         });
         const savedStudent = await newStudent.save();
@@ -96,3 +100,18 @@ const getAllStudents = async (req, res) => {
     }
 };
 exports.getAllStudents = getAllStudents;
+const updateProjectStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+        const getProject = await projectModel_1.default.findByIdAndUpdate(id, status, { new: true });
+        if (!getProject) {
+            return res.status(400).json({ message: "Project not found" });
+        }
+        res.status(200).json({ message: "Status updated successfully", getProject });
+    }
+    catch (error) {
+        res.status(500).json({ message: "An error occurred", error: error.message });
+    }
+};
+exports.updateProjectStatus = updateProjectStatus;

@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDepartmentStats = exports.getDepartments = exports.createDepartment = void 0;
 const departmentModel_1 = __importDefault(require("../model/departmentModel"));
 const studentModel_1 = __importDefault(require("../model/studentModel"));
+const projectModel_1 = __importDefault(require("../model/projectModel"));
 const createDepartment = async (req, res) => {
     try {
         const { departmentName, departmentCode, description } = req.body;
@@ -45,27 +46,12 @@ exports.getDepartments = getDepartments;
 const getDepartmentStats = async (req, res) => {
     try {
         const { departmentId } = req.params;
-        // Find department
-        const department = await departmentModel_1.default.findById(departmentId);
-        if (!department) {
-            return res.status(404).json({ message: "Department not found" });
-        }
-        // Count students in this department
         const studentCount = await studentModel_1.default.countDocuments({ department: departmentId });
-        // Get unique project IDs from students
-        const students = await studentModel_1.default.find({ department: departmentId }).populate("project");
-        const projectSet = new Set();
-        students.forEach((s) => {
-            s.project.forEach((p) => projectSet.add(p._id.toString()));
-        });
-        res.status(200).json({
-            department,
-            studentCount,
-            projectCount: projectSet.size,
-        });
+        const projectCount = await projectModel_1.default.countDocuments({ department: departmentId });
+        res.status(200).json({ studentCount, projectCount });
     }
-    catch (error) {
-        res.status(500).json({ message: "Error fetching department stats", error: error.message });
+    catch (err) {
+        res.status(500).json({ message: "Error fetching department stats", error: err.message });
     }
 };
 exports.getDepartmentStats = getDepartmentStats;

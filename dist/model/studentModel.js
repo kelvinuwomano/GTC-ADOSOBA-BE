@@ -61,6 +61,14 @@ const studentSchema = new mongoose_1.Schema({
         type: Date,
         required: true,
     },
+    closureDate: {
+        type: Date,
+        required: true,
+    },
+    session: {
+        type: Date,
+        required: true,
+    },
     department: {
         type: mongoose_1.default.Schema.Types.ObjectId,
         ref: "Department",

@@ -7,6 +7,8 @@ export interface IStudent extends Document {
   email: string;
   phoneNumber: string;
   enrollmentDate: Date;
+  closureDate: Date;
+  session: Date;
   department: mongoose.Types.ObjectId;
   project: mongoose.Types.ObjectId[];
 }
@@ -38,6 +40,14 @@ const studentSchema = new Schema<IStudent>(
     enrollmentDate: {
       type: Date,
       required: true,
+    },
+    closureDate: {
+      type: Date,
+      required: true,
+    },
+    session: {
+      type: Date,
+      required: true
     },
     department: {
       type: mongoose.Schema.Types.ObjectId,

@@ -12,7 +12,9 @@ export const createStudent = async (req: Request, res: Response) => {
       phoneNumber,
       enrollmentDate,
       department,
-      projects,
+      project,
+      closureDate,
+      session,
     } = req.body;
     if (
       !studentID ||
@@ -21,13 +23,15 @@ export const createStudent = async (req: Request, res: Response) => {
       !email ||
       !phoneNumber ||
       !enrollmentDate ||
-      !department
+      !department ||
+      !closureDate ||
+      !session
     ) {
       return res.status(400).json({ message: "All fields required" });
     }
     let projectsIds: string[] = [];
-    if (projects && Array.isArray(projects)) {
-      const createProjects = await Project.insertMany(projects);
+    if (project && Array.isArray(project)) {
+      const createProjects = await Project.insertMany(project);
       projectsIds = createProjects.map((p) => p._id.toString());
     }
     const newStudent = new Student({
@@ -38,6 +42,8 @@ export const createStudent = async (req: Request, res: Response) => {
       phoneNumber,
       enrollmentDate,
       department,
+      session,
+      closureDate,
       project: projectsIds,
     });
     const savedStudent = await newStudent.save();
@@ -98,3 +104,17 @@ export const getAllStudents = async (req: Request, res: Response) => {
       .json({ message: "An error occurred", error: error.message });
   }
 };
+
+export const updateProjectStatus = async (req: Request, res: Response) => {
+  try {
+    const {id} = req.params;
+    const {status} = req.body;
+    const getProject = await Project.findByIdAndUpdate(id, {status}, {new: true})
+    if (!getProject) {
+      return res.status(400).json({ message: "Project not found"})
+    }
+    res.status(200).json({message: "Status updated successfully", getProject})
+  } catch (error: any) {
+    res.status(500).json({message: "An error occurred", error: error.message})
+  }
+}
