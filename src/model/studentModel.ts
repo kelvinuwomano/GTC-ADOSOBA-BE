@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-interface IStudent extends Document {
+export interface IStudent extends Document {
   studentID: string;
   firstName: string;
   lastName: string;
