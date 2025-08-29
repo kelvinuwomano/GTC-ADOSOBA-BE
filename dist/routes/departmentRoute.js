@@ -8,4 +8,5 @@ const departmentController_1 = require("../controller/departmentController");
 const departmentRoute = express_1.default.Router();
 departmentRoute.post("/create-department", departmentController_1.createDepartment);
 departmentRoute.get("/all-departments", departmentController_1.getDepartments);
+departmentRoute.get("/:departmentId/stats", departmentController_1.getDepartmentStats);
 exports.default = departmentRoute;

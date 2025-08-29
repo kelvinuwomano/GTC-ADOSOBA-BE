@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Department from "../model/departmentModel";
 import Student, { IStudent } from "../model/studentModel";
+import Project from "../model/projectModel";
 
 export const createDepartment = async (req: Request, res: Response) => {
   try {
@@ -40,30 +41,12 @@ export const getDepartments = async (req: Request, res: Response) => {
 export const getDepartmentStats = async (req: Request, res: Response) => {
   try {
     const { departmentId } = req.params;
-
-    // Find department
-    const department = await Department.findById(departmentId);
-    if (!department) {
-      return res.status(404).json({ message: "Department not found" });
-    }
-
-    // Count students in this department
     const studentCount = await Student.countDocuments({ department: departmentId });
+    const projectCount = await Project.countDocuments({ department: departmentId });
 
-    // Get unique project IDs from students
-    const students = await Student.find({ department: departmentId }).populate("project");
-    const projectSet = new Set<string>();
-    students.forEach((s: IStudent) => {
-      s.project.forEach((p: any) => projectSet.add(p._id.toString()));
-    });
-
-    res.status(200).json({
-      department,
-      studentCount,
-      projectCount: projectSet.size,
-    });
-  } catch (error: any) {
-    res.status(500).json({ message: "Error fetching department stats", error: error.message });
+    res.status(200).json({ studentCount, projectCount });
+  } catch (err: any) {
+    res.status(500).json({ message: "Error fetching department stats", error: err.message });
   }
 };
 
